@@ -48,6 +48,7 @@ group :development, :test do
 
   # Improve the error message you get in the browser
   gem 'better_errors'
+  gem 'binding_of_caller'
 
   # Use pry for rails console
   gem 'pry-rails'

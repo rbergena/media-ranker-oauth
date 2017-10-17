@@ -25,9 +25,9 @@
       <div class="float-right">
         <% if @login_user %>
           <%= link_to "Logged in as #{@login_user.username}", user_path(@login_user), class: "button" %>
-          <%= link_to "Log Out", logout_path, method: :post, class: "button" %>
+          <%= link_to "Log Out", logout_path, class: "button" %>
         <% else %>
-          <%= link_to "Log In", login_path, class: "button float-right" %>
+          <%= link_to "Log In", '/auth/github', class: "button float-right" %>
         <% end %>
       </div>
     </nav>

@@ -1,7 +1,10 @@
 class WorksController < ApplicationController
   # We should always be able to tell what category
   # of work we're dealing with
+  skip_before_action :require_login, only: [:root]
   before_action :category_from_work, except: [:root, :index, :new, :create]
+  before_action :creator, only: [:edit, :destroy, :update]
+
 
   def root
     @albums = Work.best_albums
@@ -16,10 +19,13 @@ class WorksController < ApplicationController
 
   def new
     @work = Work.new
+    @work[:user_id] = @login_user.id
   end
 
   def create
     @work = Work.new(media_params)
+    @work[:user_id] = @login_user.id
+
     @media_category = @work.category
     if @work.save
       flash[:status] = :success
@@ -42,6 +48,8 @@ class WorksController < ApplicationController
 
   def update
     @work.update_attributes(media_params)
+    @work[:user_id] = @login_user.id
+
     if @work.save
       flash[:status] = :success
       flash[:result_text] = "Successfully updated #{@media_category.singularize} #{@work.id}"
@@ -52,6 +60,8 @@ class WorksController < ApplicationController
       flash.now[:messages] = @work.errors.messages
       render :edit, status: :not_found
     end
+
+
   end
 
   def destroy
@@ -88,7 +98,19 @@ class WorksController < ApplicationController
     redirect_back fallback_location: work_path(@work), status: status
   end
 
-private
+  protected
+    def creator
+      # binding.pry
+      @work = Work.find_by(id: params[:id])
+      @work_user_id = @work.user_id
+      if  @login_user.id != @work_user_id
+        flash[:status] = :failure
+        flash[:result_text] = "Only the creator can do that!"
+        redirect_back fallback_location: { action: "index"}
+      end
+    end
+
+  private
   def media_params
     params.require(:work).permit(:title, :category, :creator, :description, :publication_year)
   end
@@ -98,4 +120,6 @@ private
     render_404 unless @work
     @media_category = @work.category.downcase.pluralize
   end
+
+
 end
