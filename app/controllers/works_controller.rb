@@ -99,6 +99,7 @@ class WorksController < ApplicationController
   end
 
   protected
+    # method to check that the logged in user is the same as the user id of the user who added the work
     def creator
       # binding.pry
       @work = Work.find_by(id: params[:id])
